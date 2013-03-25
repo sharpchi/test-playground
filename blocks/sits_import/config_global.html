@@ -1,0 +1,10 @@
+ <div style="text-align: center;">
+ <input type="hidden" name="block_sits_import_strict" value="0" />
+ <input type="checkbox" name="block_sits_import_strict" value="1"
+   <?php if(!empty($CFG->block_sits_import_strict)) 
+             echo 'checked="checked"'; ?> />
+   <?php print_string('donotallowhtml', 'block_sits_import'); ?>
+ <p>
+ <input type="submit" value="<?php print_string('savechanges'); ?>" />
+ </p>
+</div>

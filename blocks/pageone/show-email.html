@@ -1,0 +1,61 @@
+<?php
+/**
+ * email.html - Prints the email form for pageone
+ *
+ * @author Mark Nielsen. Modified for PageOne by Tim Williams.
+ * @package pageone
+ **/
+
+?>
+
+<table border="0" cellpadding="5">
+<tr valign="top">
+    <td align="right"><strong><?php print_string('to', 'block_pageone'); ?>:</strong></td>
+    <td>
+        <a href="javascript:void(0);" onclick="block_pageone_toggle(true, 1, 0);"><?php print_string('selectall'); ?></a> / <a href="javascript:void(0);" onclick="block_pageone_toggle(false, 1, 0);"><?php print_string('deselectall'); ?></a>
+        <br />
+        <br />
+        <?php print_table($table); ?>
+    </td>
+</tr>
+<tr valign="top">
+    <td align="right"><b><?php print_string('messagetype', 'block_pageone'); ?>:</b></td>
+    <td>
+            <?php
+                print_string('messagetype_'.$form->messagetype, 'block_pageone');
+            ?>
+    </td>
+</tr>
+<tr valign="top">
+    <td align="right"><b><?php print_string('subject', 'forum'); ?>:</b></td>
+    <td>
+        <?php echo $form->subject; ?>
+    </td>
+</tr>
+<tr valign="top">
+    <td align="right"><b>
+     <?php print_string('message', 'forum'); ?>:
+     </b></td>
+    <td align="left" rowspan="2">
+    <?php
+       if ($form->format==2)
+           echo "<pre>".$form->message."</pre>"; 
+    ?>
+    </td>
+</tr>
+
+<tr valign="top">
+    <td align="right" style="white-space:nowrap;">
+        <b><?php print_string('attachmentoptional', 'block_pageone'); ?>:</b>
+    </td>
+    <td>
+    <?php
+       echo $form->attachment;
+    ?>
+    </td>
+</tr>
+</table>
+
+<br /><br />
+
+<?php echo "<a href=\"email.php?id=$course->id&amp;instanceid=$instanceid&amp;emailid=$emailid&amp;action=view&amp;editable=1\">Re-use message</a>"; ?>

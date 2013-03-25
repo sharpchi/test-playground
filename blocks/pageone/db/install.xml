@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="blocks/pageone/db" VERSION="20090113" COMMENT="XMLDB file for block blocks/pageone"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+      <TABLE NAME="block_pageone_log" COMMENT="Stores the text/email history for the pageone block" NEXT="block_pageone_alphatags">
+        <FIELDS>
+          <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="courseid"/>
+          <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="userid"/>
+          <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="courseid" NEXT="mailto"/>
+          <FIELD NAME="mailto" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" ENUM="false" PREVIOUS="userid" NEXT="subject"/>
+          <FIELD NAME="subject" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" PREVIOUS="mailto" NEXT="message"/>
+          <FIELD NAME="message" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" ENUM="false" PREVIOUS="subject" NEXT="attachment"/>
+          <FIELD NAME="attachment" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" PREVIOUS="message" NEXT="format"/>
+          <FIELD NAME="format" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" ENUM="false" PREVIOUS="attachment" NEXT="timesent"/>
+          <FIELD NAME="timesent" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="format" NEXT="messagetype"/>
+          <FIELD NAME="messagetype" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="timesent" NEXT="status"/>
+          <FIELD NAME="status" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="messagetype" NEXT="failednumbers"/>
+          <FIELD NAME="failednumbers" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" ENUM="false" PREVIOUS="status" NEXT="includefrom"/>
+          <FIELD NAME="includefrom" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="failednumbers" NEXT="ovid"/>
+          <FIELD NAME="ovid" TYPE="int" LENGTH="15" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="includefrom"/>
+        </FIELDS>
+        <KEYS>
+          <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for block_pageone_log" NEXT="courseid"/>
+          <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id" PREVIOUS="primary" NEXT="userid"/>
+          <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" PREVIOUS="courseid"/>
+        </KEYS>
+      </TABLE>
+      <TABLE NAME="block_pageone_alphatags" COMMENT="Stores custom alpha tags for pageone users" PREVIOUS="block_pageone_log" NEXT="block_pageone_inlog">
+        <FIELDS>
+          <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="userid"/>
+          <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="alphatag"/>
+          <FIELD NAME="alphatag" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" PREVIOUS="userid" NEXT="receive"/>
+          <FIELD NAME="receive" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="alphatag"/>
+        </FIELDS>
+        <KEYS>
+          <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for block_pageone_alphatags" NEXT="userid"/>
+          <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" PREVIOUS="primary"/>
+        </KEYS>
+      </TABLE>
+      <TABLE NAME="block_pageone_inlog" COMMENT="Stores the incomming messages for the pageone block" PREVIOUS="block_pageone_alphatags">
+        <FIELDS>
+          <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="courseid"/>
+          <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="userid"/>
+          <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="courseid" NEXT="mailfrom"/>
+          <FIELD NAME="mailfrom" TYPE="int" LENGTH="16" NOTNULL="true" SEQUENCE="false" ENUM="false" PREVIOUS="userid" NEXT="timesent"/>
+          <FIELD NAME="timesent" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="mailfrom" NEXT="message" />
+          <FIELD NAME="message" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" ENUM="false" PREVIOUS="timesent"/>
+        </FIELDS>
+        <KEYS>
+          <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for block_pageone_log" NEXT="courseid"/>
+          <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id" PREVIOUS="primary" NEXT="userid"/>
+          <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" PREVIOUS="courseid"/>
+        </KEYS>
+      </TABLE>
+  </TABLES>
+</XMLDB>

@@ -1,0 +1,273 @@
+diff -bu moodle-unmod/message/discussion.php moodle/message/discussion.php
+--- moodle-unmod/message/discussion.php	2008-07-06 01:15:22.000000000 +0100
++++ moodle/message/discussion.php	2008-11-27 14:34:45.000000000 +0000
+@@ -42,7 +42,7 @@
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <title><?php echo get_string('discussion', 'message').': '.fullname($user) ?></title>
+      </head>
+-     <frameset rows="110,*,0,200">
++     <frameset rows="110,*,0,300">
+        <noframes><body><?php
+            echo '<a href="discussion.php?id='.$userid.'&amp;noframesjs=1">'.get_string('noframesjs', 'message').'</a>';
+        ?></body></noframes>
+@@ -71,6 +71,7 @@
+     $refresh  = optional_param('refresh', '', PARAM_RAW);
+     $last     = optional_param('last', 0, PARAM_INT);
+     $newonly  = optional_param('newonly', 0, PARAM_BOOL);
++    $send_by_mm = optional_param('send_by_mm', 0, PARAM_INT);
+ 
+     $addcontact     = optional_param('addcontact',     0, PARAM_INT); // adding a contact
+     $removecontact  = optional_param('removecontact',  0, PARAM_INT); // removing a contact
+@@ -119,7 +120,11 @@
+ 
+     } else if (empty($refresh) and data_submitted() and confirm_sesskey()) {
+         if ($message!='') {
+-            message_post_message($USER, $user, $message, $format, 'direct');
++            $send_text=false;
++            if (pageone_find_course($user->id, $USER->id)!=null && $send_by_mm==true)
++                $send_text=true;
++
++            message_post_message($USER, $user, $message, $format, 'direct', $send_text);
+         }
+         redirect('discussion.php?id='.$userid.'&amp;start='.$start.'&amp;noframesjs='.$noframesjs.'&amp;newonly='.$newonly.'&amp;last='.$last);
+     }
+@@ -177,6 +182,11 @@
+         echo '<input type="hidden" name="format" value="'.FORMAT_MOODLE.'" />';
+     }
+     echo '</div><div>';
++    if (pageone_find_course($user->id, $USER->id)!=null && $CFG->block_pageone_mtype==MTYPE_MM)
++    {
++        echo '<input type="checkbox" value="1" name="send_by_mm" />'.get_string('send_with_mm', 'block_pageone').'<br />'.
++             '<input type="checkbox" name="includefrom" checked="checked" />'.get_string('includefrom', 'block_pageone').'<br />';
++    }
+     echo '<input type="hidden" name="id" value="'.$user->id.'" />';
+     echo '<input type="hidden" name="start" value="'.$start.'" />';
+     echo '<input type="hidden" name="noframesjs" value="'.$noframesjs.'" />';
+diff -bu moodle-unmod/message/lib.php moodle/message/lib.php
+--- moodle-unmod/message/lib.php	2008-04-24 01:14:52.000000000 +0100
++++ moodle/message/lib.php	2008-12-08 15:36:53.000000000 +0000
+@@ -1,6 +1,6 @@
+ <?php
+ /// library functions for messaging
+-
++require_once($CFG->dirroot."/blocks/pageone/pageonelib.php");
+ 
+ define ('MESSAGE_SHORTLENGTH', 300);
+ define ('MESSAGE_WINDOW', true);          // We are in a message window (so don't pop up a new one!)
+@@ -15,6 +15,11 @@
+     $CFG->message_offline_time = 300;
+ }
+ 
++/*****This function exists so we can detect the presence of the MoodleMobile Messaging patch*****/
++function message_moodle_mobile_patch()
++{
++    return true;
++}
+ 
+ function message_print_contacts() {
+     global $USER, $CFG;
+@@ -116,7 +121,7 @@
+                     
+                     link_to_popup_window("/message/discussion.php?id=$contact->id", "message_$contact->id",
+                                          $fullnamelink, 500, 500, get_string('sendmessageto', 'message', $fullname),
+-                                         'menubar=0,location=0,status,scrollbars,resizable,width=500,height=500');
++                                         'menubar=0,location=0,status,scrollbars,resizable,width=500,height=600');
+ 
+                     echo '</td>';
+                     echo '<td class="link">'.$strcontact.'&nbsp;'.$strhistory.'</td>';
+@@ -151,7 +156,7 @@
+                 echo '<td class="contact">';
+                 link_to_popup_window("/message/discussion.php?id=$contact->id", "message_$contact->id",
+                             $fullnamelink, 500, 500, get_string('sendmessageto', 'message', $fullname),
+-                            'menubar=0,location=0,status,scrollbars,resizable,width=500,height=500');
++                            'menubar=0,location=0,status,scrollbars,resizable,width=500,height=600');
+ 
+                 echo '</td>';
+                 echo '<td class="link">'.$strcontact.'&nbsp;'.$strhistory.'</td>';
+@@ -186,7 +191,7 @@
+                 
+                 link_to_popup_window("/message/discussion.php?id=$messageuser->useridfrom", "message_$messageuser->useridfrom",
+                                      $fullnamelink, 500, 500, get_string('sendmessageto', 'message', $fullname),
+-                                     'menubar=0,location=0,status,scrollbars,resizable,width=500,height=500');
++                                     'menubar=0,location=0,status,scrollbars,resizable,width=500,height=600');
+ 
+                 echo '</td>';
+                 echo '<td class="link">&nbsp;'.$strcontact.'&nbsp;'.$strblock.'&nbsp;'.$strhistory.'</td>';
+@@ -400,7 +405,7 @@
+                 echo '<td class="contact">';
+                 link_to_popup_window("/message/discussion.php?id=$user->id", "message_$user->id", fullname($user),
+                                      500, 500, get_string('sendmessageto', 'message', fullname($user)),
+-                                     'menubar=0,location=0,status,scrollbars,resizable,width=500,height=500');
++                                     'menubar=0,location=0,status,scrollbars,resizable,width=500,height=600');
+ 
+                 echo '</td>';
+ 
+@@ -573,7 +578,7 @@
+ 
+         link_to_popup_window("/message/discussion.php?id=$user->id", "message_$user->id",
+                              fullname($user), 400, 400, get_string('sendmessageto', 'message', fullname($user)),
+-                             'menubar=0,location=0,status,scrollbars,resizable,width=500,height=500');
++                             'menubar=0,location=0,status,scrollbars,resizable,width=500,height=600');
+     }
+ }
+ 
+@@ -657,7 +662,7 @@
+ 
+     $str = link_to_popup_window("/message/history.php?user1=$userid1&amp;user2=$userid2$keywords$position",
+                     "message_history_$userid1", $fulllink, 500, 500, $strmessagehistory,
+-                    'menubar=0,location=0,status,scrollbars,resizable,width=500,height=500', true);
++                    'menubar=0,location=0,status,scrollbars,resizable,width=500,height=600', true);
+ 
+     $str = '<span class="history">'.$str.'</span>';
+ 
+@@ -980,7 +985,7 @@
+  * Inserts a message into the database, but also forwards it
+  * via other means if appropriate.
+  */
+-function message_post_message($userfrom, $userto, $message, $format, $messagetype) {
++function message_post_message($userfrom, $userto, $message, $format, $messagetype, $send_text=false) {
+ 
+     global $CFG, $SITE, $USER;
+ 
+@@ -1049,17 +1054,56 @@
+ 
+             email_to_user($userto, $userfrom, $messagesubject, $messagetext, $messagehtml);
+             debugging('Mail was sent', DEBUG_NORMAL);
+-            echo "mail was sent"; 
+             sleep(3);
+         }
+     }
+ 
++    if ($send_text)
++    {
++        $messagetext = format_text_email($message, $format);
++        $textresult=pageone_send_text(array($userto), $userfrom, "", $messagetext, true);
++
++        $log = new stdClass;
++        $log->ovid       = $textresult->id;
++
++        $courseid=pageone_find_course($userto->id, $userfrom->id);
++        if ($courseid==null)
++            $log->courseid = 1;
++        else
++            $log->courseid = $courseid;
++
++        $log->userid     = $userfrom->id;
++        $log->mailto     = $userto->id;
++        $log->subject    = addslashes($messagesubject);
++        $log->message    = addslashes($message);
++        $log->attachment = '';
++        $log->format     = $format;
++        $log->timesent   = time();
++        $log->messagetype = TYPE_TEXT_MM;
++        $log->includefrom=true;
++
++        if ($textresult->ok==false)
++        {
++            $log->status=PAGEONE_ERRORS;
++            $log->failednumbers=$textresult->failednumbers;
++        }
++        else
++        {
++            $log->status=PAGEONE_NO_ERRORS;
++            $log->failednumbers="";
++        }
++
++        if (!insert_record('block_pageone_log', $log))
++        {
++            error('Message not logged.');
++        }
++    }
++
+     $USER->lang = $savelang;  // restore original language
+ 
+     return $savemessage->id;
+ }
+ 
+-
+ /*
+  * Returns a list of all user ids who have used messaging in the site
+  * This was the simple way to code the SQL ... is it going to blow up
+diff -bu moodle-unmod/message/send.php moodle/message/send.php
+--- moodle-unmod/message/send.php	2008-05-02 01:14:30.000000000 +0100
++++ moodle/message/send.php	2008-11-27 17:37:44.000000000 +0000
+@@ -40,6 +40,7 @@
+     $userid   = required_param('id', PARAM_INT);
+     $message  = optional_param('message', '', PARAM_CLEANHTML);
+     $format   = optional_param('format', FORMAT_MOODLE, PARAM_INT);
++    $send_by_mm = optional_param('send_by_mm', 0, PARAM_INT);
+ 
+ /// Check the user we are talking to is valid
+     if (! $user = get_record('user', 'id', $userid)) {
+@@ -65,8 +66,12 @@
+ 
+     if ($message!='' and confirm_sesskey()) {   /// Current user has just sent a message
+ 
++        $send_text=false;
++        if (pageone_find_course($user->id, $USER->id)!=null && $send_by_mm==true)
++            $send_text=true;
++
+     /// Save it to the database...
+-        $messageid = message_post_message($USER, $user, addslashes($message), $format, 'direct');
++        $messageid = message_post_message($USER, $user, addslashes($message), $format, 'direct', $send_text);
+ 
+     /// Format the message as HTML
+         $options = NULL;
+@@ -94,10 +99,56 @@
+ 
+     echo '<body class="message course-1" id="message-send">';
+     echo '<center>';
+-    echo '<form id="editing" method="post" action="send.php">';
++    echo '<form id="editing" method="post" action="send.php" name="theform">';
+     echo '<input type="hidden" name="id" value="'.$user->id.'" />';
+     echo '<input type="hidden" name="sesskey" value="'.$USER->sesskey.'" />';
+ 
++    if (pageone_find_course($user->id, $USER->id)!=null && $CFG->block_pageone_mtype==MTYPE_MM)
++    {
++     ?>
++        <table style="margin-top:5px;margin-bottom:0px;"><tr>
++         <td style="font-size:small;"><b><?php print_string('credit_usage', 'block_pageone'); ?>:</b></td>
++         <td style="font-size:small;" class="informationbox"><div id="creditusage"></div><div id="warningCell" style="font-size:x-small;"></div></td>
++        </tr><tr>
++         <td style="font-size:small;" colspan="2"><input type="checkbox" value="1" name="send_by_mm" /><?php print_string('send_with_mm', 'block_pageone');?></td>
++        </tr><tr>
++         <td style="font-size:small;" colspan="2"><input type="checkbox" name="includefrom" "checked="checked" /> <?php print_string('includefrom', 'block_pageone'); ?></td>
++        </tr></table>
++
++        <script type="text/javascript" src="../blocks/pageone/script/prototype.js"></script>
++        <script type="text/javascript" src="../blocks/pageone/script/fieldCounter.js"></script>
++        <script type="text/javascript">
++
++         var smsCounter = new PageoneCounter.PageoneSMSCounter(2000);
++
++         var fieldMonitor = new PageoneCounter.PageoneCharMonitor();
++         var fromString = "<?php echo get_string("from", "block_pageone").":".$USER->firstname." ".$USER->lastname."\\n"; ?>";
++
++         function checkField()
++         {
++             var aField=document.theform.message.value;
++
++             var extChars = fieldMonitor.getExtendedChars(aField);
++
++             if(extChars.length>0)
++             {
++                 smsCounter.setSMSSize(70);
++                 $('warningCell').innerHTML = "<br /><?php print_string("messagewarn_1", "block_pageone")?> ("+extChars+") <?php print_string("messagewarn_2", "block_pageone")?>";
++             }
++             else
++             {
++                 smsCounter.setSMSSize(160);
++                 $('warningCell').innerHTML = "";
++              }
++             smsCounter.displayCounter(aField, $('creditusage'));
++         }
++
++         var monitor=setInterval('checkField()', 1000);
++
++         </script>
++        <?php
++    }
++
+     $usehtmleditor = (can_use_html_editor() && get_user_preferences('message_usehtmleditor', 0));
+     if ($usehtmleditor) {
+         echo '<table align="center"><tr><td align="center">';

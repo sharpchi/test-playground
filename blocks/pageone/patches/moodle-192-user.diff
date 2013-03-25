@@ -1,0 +1,39 @@
+diff -bur moodle-unmod/user/view.php html/user/view.php
+--- moodle-unmod/user/view.php	2008-07-06 01:18:04.000000000 +0100
++++ html/user/view.php	2008-12-08 16:21:46.000000000 +0000
+@@ -5,6 +5,7 @@
+     require_once("../config.php");
+     require_once($CFG->dirroot.'/user/profile/lib.php');
+     require_once($CFG->dirroot.'/tag/lib.php');
++    require_once("../blocks/pageone/pageonelib.php");
+ 
+     $id      = optional_param('id',     0,      PARAM_INT);   // user id
+     $course  = optional_param('course', SITEID, PARAM_INT);   // course id (defaults to Site)
+@@ -502,11 +503,26 @@
+             echo "<form onclick=\"this.target='message$user->id'\" action=\"../message/discussion.php\" method=\"get\">";
+             echo "<div>";
+             echo "<input type=\"hidden\" name=\"id\" value=\"$user->id\" />";
+-            echo "<input type=\"submit\" value=\"".get_string("sendmessage", "message")."\" onclick=\"return openpopup('/message/discussion.php?id=$user->id', 'message_$user->id', 'menubar=0,location=0,scrollbars,status,resizable,width=400,height=500', 0);\" />";
++            echo "<input type=\"submit\" value=\"".get_string("sendmessage", "message")."\" onclick=\"return openpopup('/message/discussion.php?id=$user->id', 'message_$user->id', 'menubar=0,location=0,scrollbars,status,resizable,width=400,height=600', 0);\" />";
+             echo "</div>";
+             echo "</form>";
+         }
+     }
++
++    // MoodleMobile patch
++    if ($user->id!=$USER->id)
++    {
++        $courseid=pageone_find_course($user->id, $USER->id);
++        if ($courseid!=null)
++        {
++            echo "<form action=\"../blocks/pageone/email.php\" method=\"get\">".
++                 "<input type=\"hidden\" name=\"to\" value=\"".$user->id."\" />".
++                 "<input type=\"hidden\" name=\"id\" value=\"".$courseid."\" />".
++                 "<input type=\"submit\" value=\"".get_string("contact_with_mm", "block_pageone")."\" />".
++                 "</form>";
++        }
++    }
++
+     // Authorize.net: User Payments
+     if ($course->enrol == 'authorize' || (empty($course->enrol) && $CFG->enrol == 'authorize')) {
+         echo "<form action=\"../enrol/authorize/index.php\" method=\"get\">";

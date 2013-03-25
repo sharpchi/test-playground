@@ -1,0 +1,259 @@
+<?php
+ /**
+ * Global config page for Moodle block
+ * @author Tim Williams
+ * @package pageone
+ **/
+
+ require_once('pageonelib.php');
+?>
+<div style="text-align:center;">
+<?php
+if (class_exists("DOMNodeList") || function_exists("domxml_open_mem"))
+{
+?>
+  <table style="margin-left:auto;margin-right:auto;">
+  <tr>
+    <td style="text-align:right;">
+        <label for="block_pageone_account_num_label"><?php print_string("config_account_num", "block_pageone"); ?></label>
+    </td>
+    <td style="text-align:left;">
+        <input type="text" size="40" name="block_pageone_account_num" id="block_pageone_account_num_label" 
+         value="<?php if (isset($CFG->block_pageone_account_num)) echo $CFG->block_pageone_account_num; ?>"/>
+    </td>
+  </tr>
+  <tr>
+    <td style="text-align:right;">
+        <label for="block_pageone_account_pass_label"><?php print_string("config_account_pass", "block_pageone"); ?></label>
+    </td>
+    <td style="text-align:left;">
+        <input type="password" size="40" name="block_pageone_account_pass" id="block_pageone_account_pass_label" 
+         value="<?php if (isset($CFG->block_pageone_account_pass)) echo $CFG->block_pageone_account_pass; ?>"/>
+    </td>
+  </tr>
+  <tr><td colspan="2">&nbsp;</td></tr>
+  <tr>
+    <td style="text-align:right;">
+        <label for="block_pageone_mobile_locale"><?php print_string("config_mobile_find", "block_pageone"); ?></label>
+    </td>
+    <td style="text-align:left;">
+    <select name="block_pageone_locale" id="block_pageone_mobile_locale">
+        <?php
+
+            $locale=$CFG->block_pageone_locale;
+            if (file_exists('locales/'.$locale.'.php')>0)
+                $locale="first_valid";
+
+            $locales=pageone_get_mobile_locales();
+            for ($loop=0; $loop<count($locales); $loop++)
+            {
+                echo '<option value="'.$locales[$loop].'"';
+                if ($locales[$loop]==$locale)
+                    echo " selected=\"selected\"";
+
+                echo '>'.pageone_get_locale_name($locales[$loop]).'</option>';
+            }
+        ?>
+    </select>
+    </td>
+  </tr>
+  <tr>
+    <td style="text-align:right;">
+        <label for="block_pageone_country_code_label"><?php print_string("config_country_code", "block_pageone"); ?></label>
+    </td>
+    <td style="text-align:left;">
+        <input type="text" size="40" name="block_pageone_country_code" id="block_pageone_country_code_label" 
+         value="<?php if (!isset($CFG->block_pageone_country_code)) $CFG->block_pageone_country_code=44; echo $CFG->block_pageone_country_code; ?>"/>
+    </td>
+  </tr>
+  <tr><td colspan="2">&nbsp;</td></tr>
+  <tr>
+    <td style="text-align:right;">
+        <label for="block_pageone_mtype_label"><?php print_string("config_mtype", "block_pageone"); ?></label>
+    </td>
+    <td style="text-align:left;">
+        <select name="block_pageone_mtype" id="block_pageone_mtype_label">
+        <?php
+            if (!isset($CFG->block_pageone_mtype))
+                $CFG->block_pageone_mtype=MTYPE_EMAIL;
+
+            if ($CFG->block_pageone_mtype==MTYPE_EMAIL)
+                echo '<option value="'.MTYPE_EMAIL.'" selected="selected">'.get_string('config_mtype_'.MTYPE_EMAIL, 'block_pageone').'</option>';
+            else
+                echo '<option value="'.MTYPE_EMAIL.'">'.get_string('config_mtype_'.MTYPE_EMAIL, 'block_pageone').'</option>';
+
+            if ($CFG->messaging==true)
+            {
+                if ($CFG->block_pageone_mtype==MTYPE_MM)
+                    echo '<option value="'.MTYPE_MM.'" selected="selected">'.get_string('config_mtype_'.MTYPE_MM, 'block_pageone').'</option>';
+                else
+                    echo '<option value="'.MTYPE_MM.'">'.get_string('config_mtype_'.MTYPE_MM, 'block_pageone').'</option>';
+            }
+        ?>
+        </select><span style="font-size:small">
+        <?php
+            if ($CFG->messaging==false)
+                print_string('mm_disabled', 'block_pageone');
+        ?></span>
+    </td>
+  </tr>
+  <tr>
+    <td style="text-align:right;">
+        <label for="block_pageone_receive_label"><?php print_string("config_receive", "block_pageone"); ?></label>
+    </td>
+    <td style="text-align:left;">
+        <select name="block_pageone_receive" id="block_pageone_receive_label">
+        <?php
+            if (!isset($CFG->block_pageone_receive))
+                $CFG->block_pageone_receive=RECEIVE_IGNORE;
+
+            for ($loop=0; $loop<4; $loop++)
+            {
+                if ($CFG->block_pageone_receive==$loop)
+                    echo '<option value="'.$loop.'" selected="selected">'.get_string('config_receive_'.$loop, 'block_pageone').'</option>';
+                else
+                    echo '<option value="'.$loop.'">'.get_string('config_receive_'.$loop, 'block_pageone').'</option>';
+            }
+        ?>
+        </select>
+    </td>
+  </tr>
+  <tr>
+    <td style="text-align:right;">
+        <label for="block_pageone_default_mbox_label"><?php print_string("config_default_mbox", "block_pageone"); ?></label>
+    </td>
+    <td style="text-align:left;">
+        <input type="text" size="40" name="block_pageone_default_mbox" id="block_pageone_default_mbox_label" 
+         value="<?php if (isset($CFG->block_pageone_default_mbox)) echo $CFG->block_pageone_default_mbox; ?>"/>
+    </td>
+  </tr>
+  <tr><td colspan="2">&nbsp;</td></tr>
+  <tr>
+    <td style="text-align:right;">
+        <label for="block_pageone_alpha_tag_label"><?php print_string("config_alpha_tag", "block_pageone"); ?></label>
+    </td>
+    <td style="text-align:left;">
+        <?php
+            if (isset($CFG->block_pageone_alpha_tag))
+                echo pageone_get_alphatagoptions("block_pageone_alpha_tag", "block_pageone_alpha_tag_label", $CFG->block_pageone_alpha_tag).' ';
+            else
+                echo pageone_get_alphatagoptions("block_pageone_alpha_tag", "block_pageone_alpha_tag_label").' ';
+            print_string('alphatag_help', 'block_pageone');
+        ?>
+    </td>
+  </tr>
+  <tr><td colspan="2">&nbsp;</td></tr>
+  <tr>
+    <td style="text-align:right;">
+        <label for="block_pageone_https_label"><?php print_string("config_https", "block_pageone"); ?></label>
+    </td>
+    <td style="text-align:left;">
+        <select name="block_pageone_https" id="block_pageone_https_label">
+        <?php
+            if (isset($CFG->block_pageone_https)==false)
+                $CFG->block_pageone_https=false;
+
+            if ($CFG->block_pageone_https==true)
+                echo "<option selected=\"selected\" value=\"1\">".get_string("yes")."</option>\n".
+                     "<option value=\"0\">".get_string("no")."</option>\n";
+            else
+                echo "<option value=\"1\">".get_string("yes")."</option>\n".
+                     "<option selected=\"selected\" value=\"0\">".get_string("no")."</option>\n";
+        ?>
+        </select>
+    </td>
+  </tr>
+  </table><br />
+  <input type="submit" value="<?php print_string('savechanges'); ?>" />
+
+  <?php
+      if (pageone_is_configured())
+      {
+  ?>
+  <br /><br /><hr />
+
+  <h2><?php print_string("account_info", "block_pageone"); ?></h2>
+
+  <table width="70%" style="margin-left:auto;margin-right:auto;"><tr>
+      <td style="text-align:left;">
+          <ul>
+              <li><a href="<?php echo $CFG->wwwroot;?>/blocks/pageone/editalpha.php"><?php print_string("config_edit_alpha_link", "block_pageone"); ?></a></li>
+              <li><a href="<?php echo $CFG->wwwroot;?>/blocks/pageone/emaillog.php?id=1&amp;show=all"><?php print_string("config_edit_log_link", "block_pageone"); ?></a></li>
+              <li><a href="<?php echo $CFG->wwwroot;?>/blocks/pageone/callback_edit.php"><?php print_string("callback_problem_3", "block_pageone"); ?></a></li>
+          </ul>
+      </td>
+      <td>
+          <table class="generaltable generalbox" style="margin-left:auto;margin-right:auto;"><tr>
+              <th class="header" style="padding:5px;"><?php print_string("account_works", "block_pageone"); ?></th>
+              <td class="cell" style="padding:5px;"><?php
+                if (pageone_test_account()==PAGEONE_SUCESS)
+                    print_string("ok");
+                else
+                    print_string("failed", "block_pageone");
+              ?></td>
+          </tr><tr>
+              <th class="header" style="padding:5px;"><?php print_string("callback_ok", "block_pageone"); ?><br />
+                  <span style="font-size:x-small;">(<?php print_string("callback_ok_des", "block_pageone"); ?>)</span></th>
+              <td class="cell" style="padding:5px;"><?php
+                $callbacks_ok=pageone_check_callbacks();
+                if ($callbacks_ok)
+                    print_string("registered", "block_pageone");
+                else
+                    $callbacks_ok=pageone_fix_callbacks();
+              ?></td>
+          </tr><tr>
+              <th class="header" style="padding:5px;"><?php print_string("available_credit", "block_pageone"); ?></th>
+              <td class="cell" style="padding:5px;"><?php echo pageone_available_credit(); ?></td>
+          </tr></table>
+      </td>
+  </tr></table>
+  <?php
+      }
+
+      if ($callbacks_ok==false)
+      {
+          echo "<div class=\"informationbox\" style=\"text-align:left\"><p>".get_string("callback_problem", "block_pageone")."</p>".
+              "<ul>".
+              " <li><a href=\"".$CFG->wwwroot."/blocks/pageone/callback_edit.php?action=addignore\">\n".
+              get_string("callback_problem_1", "block_pageone")."</a></li>\n".
+              " <li><a href=\"".$CFG->wwwroot."/blocks/pageone/callback_edit.php?action=deletealladd\">\n".
+              get_string("callback_problem_2", "block_pageone")." </a></li>\n".
+              "<li><a href=\"".$CFG->wwwroot."/blocks/pageone/callback_edit.php\">\n".
+              get_string("callback_problem_3", "block_pageone")." </a></li>\n".
+              "</ul></div>";
+      }
+      else
+      {
+        echo "<p>".get_string("callback_delay", "block_pageone")."</p>";
+      }
+  ?>
+</div>
+<?php
+}
+else
+   echo "<p style='color:#ff0000'>".get_string("domxml_warn", "block_pageone")."</p>";
+
+/**
+* This method tries to automatically install/fix the callback settings on the PageOne server when it detects that they are missing
+**/
+
+function pageone_fix_callbacks()
+{
+   $callbacks=pageone_get_callback_list();
+
+   if (count($callbacks)>0)
+   {
+       print_string("failed", "block_pageone");
+       return false;
+   }
+
+   pageone_set_callback();
+   $ok=pageone_check_callbacks();
+   if ($ok)
+       print_string("ok");
+   else
+       print_string("failed", "block_pageone");
+
+  return $ok;
+}
+?>

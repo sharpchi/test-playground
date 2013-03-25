@@ -1,0 +1,367 @@
+<!-- edited with XMLSpy v2008 sp1 (http://www.altova.com) by Simple (Simon) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:ov="http://jaxb.liquidsoap.pageone.com" targetNamespace="http://jaxb.liquidsoap.pageone.com">
+	<xs:import/>
+	<xs:element name="pageoneHeader">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="session-id" type="xs:string"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="isActiveRequest">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="user-id" type="xs:string"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="isActiveResponse">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:boolean">
+					<xs:attribute name="description" type="xs:string"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="loginRequest">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="user-id" type="xs:string"/>
+				<xs:element name="pwd" type="xs:string"/>
+			</xs:sequence>
+			<xs:attribute name="service-id" type="xs:int" use="optional" default="0"/>
+			<xs:attribute name="version-id" type="xs:string" use="optional" default=""/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="loginResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="status" type="ov:statusType"/>
+				<xs:element name="version-id" type="xs:string" minOccurs="0"/>
+				<xs:element name="link" type="xs:string" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="logoffRequest" type="xs:string"/>
+	<xs:element name="logoffResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="status" type="ov:statusType" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="sendMessageRequest" type="ov:sendMessageType"/>
+	<xs:element name="sendMessageResponse" type="ov:sendMessageResponseType"/>
+	<xs:element name="sendMultiMessageRequest">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="messagePacket" type="ov:sendMultiMessageType" maxOccurs="20"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="sendMultiMessageResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="messagePacketResponse" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:complexContent>
+							<xs:extension base="ov:sendMessageResponseType">
+								<xs:attribute name="requestID" type="xs:long"/>
+							</xs:extension>
+						</xs:complexContent>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="deliveryReportRequest">
+		<xs:complexType>
+			<xs:sequence minOccurs="0">
+				<xs:element name="report" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence minOccurs="0">
+							<xs:element name="address" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+							<xs:element name="dateRange" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence minOccurs="0">
+										<xs:element name="from" type="xs:dateTime" minOccurs="0"/>
+										<xs:element name="to" type="xs:dateTime" minOccurs="0"/>
+									</xs:sequence>
+									<xs:attribute name="rangeType" type="xs:int" use="optional"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="messageID" type="xs:long" use="optional"/>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="resultSetID" type="xs:string" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="deliveryReportResponse">
+		<xs:complexType>
+			<xs:sequence minOccurs="0">
+				<xs:element name="metadata" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="resultSetID" type="xs:string"/>
+							<xs:element name="resultSetHasMore" type="xs:boolean"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="receipt" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="recipient" type="xs:string" minOccurs="0"/>
+							<xs:element name="dateTimeOfReq" type="xs:dateTime" minOccurs="0"/>
+							<xs:element name="dateTimeOfResp" type="xs:dateTime" minOccurs="0"/>
+							<xs:element name="resultCode" type="xs:int" minOccurs="0"/>
+							<xs:element name="id" type="xs:long" minOccurs="0"/>
+							<xs:element name="message" type="xs:string" minOccurs="0"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="message" type="xs:string" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="replyRequest">
+		<xs:complexType>
+			<xs:sequence minOccurs="0">
+				<xs:element name="resultSetID" type="xs:string" minOccurs="0"/>
+				<xs:element name="timeSpan" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="from" type="xs:dateTime" minOccurs="0"/>
+							<xs:element name="to" type="xs:dateTime" minOccurs="0"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="replyResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="metadata" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="resultSetID" type="xs:string"/>
+							<xs:element name="resultSetHasMore" type="xs:boolean"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="reply" type="ov:reply" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="pingRequest">
+		<xs:complexType/>
+	</xs:element>
+	<xs:element name="pingResponse">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:boolean">
+					<xs:attribute name="description" type="xs:string"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="getMsisdnRequest">
+		<xs:complexType/>
+	</xs:element>
+	<xs:element name="getMsisdnResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="msisdn" type="xs:string" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="getCreditsRequest">
+		<xs:complexType/>
+	</xs:element>
+	<xs:element name="getCreditsResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="creditsRemaining" type="xs:int"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="acknowledgeCallBack">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="response">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="acknowledge" type="xs:boolean" nillable="false"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="getTemplatesRequest">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="template" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="id" type="xs:string" minOccurs="0"/>
+							<xs:element name="description" type="xs:string" minOccurs="0"/>
+							<xs:element name="message" type="xs:string" minOccurs="0"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="getTemplatesResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="template" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="id" type="xs:string" minOccurs="0"/>
+							<xs:element name="description" type="xs:string" minOccurs="0"/>
+							<xs:element name="message" type="xs:string" minOccurs="0"/>
+							<xs:element name="status" type="ov:statusType" minOccurs="0"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="getReceiptRequest">
+		<xs:complexType/>
+	</xs:element>
+	<xs:element name="getReceiptResponse" type="ov:receiptType"/>
+	<xs:element name="getInboundRequest">
+		<xs:complexType/>
+	</xs:element>
+	<xs:element name="getInboundResponse" type="ov:inboundType"/>
+	<xs:element name="getReceiptsRequest">
+		<xs:complexType/>
+	</xs:element>
+	<xs:element name="getReceiptsResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="receipts" type="ov:receiptType" minOccurs="0" maxOccurs="20"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="getInboundsRequest">
+		<xs:complexType/>
+	</xs:element>
+	<xs:element name="getInboundsResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="messages" type="ov:inboundType" minOccurs="0" maxOccurs="20"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="reply">
+		<xs:sequence>
+			<xs:element name="recipient" type="xs:string"/>
+			<xs:element name="dateTimeOfReq" type="xs:dateTime"/>
+			<xs:element name="dateTimeOfResp" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="message" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="transactionID" type="xs:string" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="statusType">
+		<xs:simpleContent>
+			<xs:extension base="xs:int">
+				<xs:attribute name="description" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="inboundType">
+		<xs:sequence>
+			<xs:element name="source" type="xs:string" minOccurs="0"/>
+			<xs:element name="destination" type="xs:string" minOccurs="0"/>
+			<xs:element name="timeReceived" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="message" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="messageID" type="xs:int"/>
+	</xs:complexType>
+	<xs:complexType name="receiptType">
+		<xs:sequence>
+			<xs:element name="source" type="xs:string"/>
+			<xs:element name="destination" type="xs:string"/>
+			<xs:element name="sentAt" type="xs:dateTime"/>
+			<xs:element name="updatedAt" type="xs:dateTime"/>
+			<xs:element name="resultCode" type="xs:int"/>
+		</xs:sequence>
+		<xs:attribute name="transactionID" type="xs:long"/>
+	</xs:complexType>
+	<xs:complexType name="sendMessageType">
+		<xs:sequence>
+			<xs:element name="sourceAddress" type="xs:string" minOccurs="0"/>
+			<xs:element name="destinationAddress" type="xs:string" maxOccurs="100"/>
+			<xs:element name="message" type="xs:string" nillable="false"/>
+			<xs:element name="expireAt" type="xs:dateTime" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="sendMultiMessageType">
+		<xs:complexContent>
+			<xs:extension base="ov:sendMessageType">
+				<xs:attribute name="requestID" type="xs:long"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="sendMessageResponseType">
+		<xs:sequence>
+			<xs:element name="transactionID" type="xs:long" nillable="true" minOccurs="0"/>
+			<xs:element name="status" type="ov:statusType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="liquidError" type="xs:string"/>
+	<xs:element name="receivedMessageListenerRequest">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="wsdlUrl" type="xs:string"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="deliveryReportListenerRequest">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="wsdlUrl" type="xs:string"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="listListenersRequest"/>
+	<xs:element name="listListenersResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="listenerWsdlUrl" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:simpleContent>
+							<xs:extension base="xs:string">
+								<xs:attribute name="id" type="xs:long"/>
+								<xs:attribute name="type"/>
+							</xs:extension>
+						</xs:simpleContent>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="unregisterListenerRequest">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="id" type="xs:long"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="status" type="ov:statusType"/>
+	<xs:element name="zipFile" type="xs:base64Binary" xmime:expectedContentTypes="application/zip"/>
+	<xs:element name="Detail" type="ov:DetailType"/>
+	<xs:complexType name="DetailType">
+		<xs:sequence>
+			<xs:element name="Photo" type="xs:base64Binary"/>
+			<xs:element name="image" type="xs:base64Binary" xmime:expectedContentTypes="image/jpeg"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>
